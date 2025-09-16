@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECOria - Environmental Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .eco-gradient {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+        }
+        
+        .quiz-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .rating-excellent { color: #22c55e; }
+        .rating-good { color: #84cc16; }
+        .rating-average { color: #eab308; }
+        .rating-poor { color: #f97316; }
+        .rating-worst { color: #ef4444; }
+        
+        .level-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🌱</div>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">ECOria</h1>
+                <p class="text-gray-600">Learn, Play, Save the Planet!</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input type="text" id="userName" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                           placeholder="Enter your name">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Age</label>
+                    <input type="number" id="userAge" required min="5" max="100"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                           placeholder="Enter your age">
+                </div>
+                
+                <button type="submit" class="w-full eco-gradient text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+                    Start Learning! 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🌱</span>
+                        <span class="text-2xl font-bold text-gray-800">ECOria</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6">
+                        <button onclick="showSection('dashboard')" class="nav-btn text-gray-600 hover:text-green-600 font-medium">Dashboard</button>
+                        <button onclick="showSection('quizzes')" class="nav-btn text-gray-600 hover:text-green-600 font-medium">Quizzes</button>
+                        <button onclick="showSection('topics')" class="nav-btn text-gray-600 hover:text-green-600 font-medium">Topics</button>
+                        <button onclick="showSection('videos')" class="nav-btn text-gray-600 hover:text-green-600 font-medium">Videos</button>
+                        <button onclick="showSection('leaderboard')" class="nav-btn text-gray-600 hover:text-green-600 font-medium">Leaderboard</button>
+                        <button onclick="showSection('profile')" class="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors">
+                            <span id="navUserName">Profile</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="section">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <!-- Welcome Header -->
+                <div class="bg-gradient-to-r from-green-400 to-blue-500 rounded-3xl p-8 text-white mb-8">
+                    <h1 class="text-4xl font-bold mb-2">Welcome back, <span id="welcomeName"></span>! 🌟</h1>
+                    <p class="text-xl opacity-90">Ready to save the planet through learning?</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Total Points</p>
+                                <p class="text-3xl font-bold text-green-600" id="totalPoints">0</p>
+                            </div>
+                            <div class="text-4xl">🏆</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Current Level</p>
+                                <p class="text-3xl font-bold text-blue-600" id="currentLevel">Beginner</p>
+                            </div>
+                            <div class="text-4xl">📚</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Rating</p>
+                                <p class="text-2xl font-bold" id="userRating">Good</p>
+                            </div>
+                            <div class="text-4xl">⭐</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm">Quizzes Completed</p>
+                                <p class="text-3xl font-bold text-purple-600" id="quizzesCompleted">0</p>
+                            </div>
+                            <div class="text-4xl">✅</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showSection('quizzes')">
+                        <div class="text-5xl mb-4">🧠</div>
+                        <h3 class="text-xl font-bold mb-2">Take a Quiz</h3>
+                        <p class="text-gray-600">Test your environmental knowledge</p>
+                    </div>
+                    
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showSection('topics')">
+                        <div class="text-5xl mb-4">📖</div>
+                        <h3 class="text-xl font-bold mb-2">Learn Topics</h3>
+                        <p class="text-gray-600">Explore environmental concepts</p>
+                    </div>
+                    
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showSection('videos')">
+                        <div class="text-5xl mb-4">🎥</div>
+                        <h3 class="text-xl font-bold mb-2">Watch Videos</h3>
+                        <p class="text-gray-600">Learn through engaging content</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quizzes Section -->
+        <div id="quizzes" class="section hidden">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Environmental Quizzes 🧠</h2>
+                    <p class="text-xl text-gray-600">Challenge yourself and earn points!</p>
+                </div>
+
+                <!-- Bonus Round Alert -->
+                <div id="bonusAlert" class="hidden bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6 rounded-r-lg">
+                    <div class="flex items-center">
+                        <div class="text-2xl mr-3">⚡</div>
+                        <div>
+                            <p class="font-bold text-yellow-800">Bonus Round Available!</p>
+                            <p class="text-yellow-700">Your points are low. Play the bonus round to earn extra points!</p>
+                        </div>
+                        <button onclick="startBonusQuiz()" class="ml-auto bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                            Play Bonus 🎯
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Levels -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="level-badge inline-block px-3 py-1 rounded-full text-sm font-bold mb-4">BEGINNER</div>
+                        <div class="text-5xl mb-4">🌱</div>
+                        <h3 class="text-xl font-bold mb-2">Beginner Level</h3>
+                        <p class="text-gray-600 mb-4">Basic environmental concepts</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm text-gray-500">5 Questions</span>
+                            <span class="text-sm text-green-600 font-semibold">+10 points each</span>
+                        </div>
+                        <button onclick="startQuiz('beginner')" class="w-full bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                            Start Quiz
+                        </button>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="level-badge inline-block px-3 py-1 rounded-full text-sm font-bold mb-4" style="background: linear-gradient(45deg, #3b82f6, #60a5fa);">INTERMEDIATE</div>
+                        <div class="text-5xl mb-4">🌿</div>
+                        <h3 class="text-xl font-bold mb-2">Intermediate Level</h3>
+                        <p class="text-gray-600 mb-4">Moderate environmental topics</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm text-gray-500">7 Questions</span>
+                            <span class="text-sm text-blue-600 font-semibold">+15 points each</span>
+                        </div>
+                        <button onclick="startQuiz('intermediate')" class="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+                            Start Quiz
+                        </button>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="level-badge inline-block px-3 py-1 rounded-full text-sm font-bold mb-4" style="background: linear-gradient(45deg, #dc2626, #f87171);">ADVANCED</div>
+                        <div class="text-5xl mb-4">🌳</div>
+                        <h3 class="text-xl font-bold mb-2">Advanced Level</h3>
+                        <p class="text-gray-600 mb-4">Complex environmental science</p>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-sm text-gray-500">10 Questions</span>
+                            <span class="text-sm text-red-600 font-semibold">+20 points each</span>
+                        </div>
+                        <button onclick="startQuiz('advanced')" class="w-full bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors">
+                            Start Quiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Game Screen -->
+        <div id="quizGame" class="section hidden">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <!-- Quiz Header -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold" id="quizTitle">Quiz</h3>
+                            <p class="text-gray-600">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Time Elapsed</p>
+                            <p class="text-2xl font-bold text-blue-600" id="timer">00:00</p>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-4">
+                        <div class="bg-green-500 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg mb-6">
+                    <div id="questionImage" class="text-center mb-6 hidden">
+                        <div class="text-8xl" id="questionEmoji">🌍</div>
+                    </div>
+                    <h4 class="text-2xl font-bold mb-6" id="questionText">Loading question...</h4>
+                    <div class="space-y-4" id="answerOptions">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quiz Controls -->
+                <div class="flex justify-between">
+                    <button onclick="showSection('quizzes')" class="bg-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
+                        Exit Quiz
+                    </button>
+                    <button id="nextButton" onclick="nextQuestion()" class="bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors hidden">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Results -->
+        <div id="quizResults" class="section hidden">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <div class="bg-white rounded-3xl p-8 shadow-2xl text-center">
+                    <div class="text-8xl mb-6" id="resultEmoji">🎉</div>
+                    <h2 class="text-4xl font-bold mb-4" id="resultTitle">Quiz Complete!</h2>
+                    <p class="text-xl text-gray-600 mb-8" id="resultMessage">Great job on completing the quiz!</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-green-50 rounded-2xl p-6">
+                            <div class="text-3xl mb-2">✅</div>
+                            <p class="text-2xl font-bold text-green-600" id="correctAnswers">0</p>
+                            <p class="text-gray-600">Correct</p>
+                        </div>
+                        <div class="bg-red-50 rounded-2xl p-6">
+                            <div class="text-3xl mb-2">❌</div>
+                            <p class="text-2xl font-bold text-red-600" id="wrongAnswers">0</p>
+                            <p class="text-gray-600">Wrong</p>
+                        </div>
+                        <div class="bg-blue-50 rounded-2xl p-6">
+                            <div class="text-3xl mb-2">⏱️</div>
+                            <p class="text-2xl font-bold text-blue-600" id="timeTaken">0:00</p>
+                            <p class="text-gray-600">Time</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 rounded-2xl p-6 mb-8">
+                        <h3 class="text-2xl font-bold mb-2">Points Earned</h3>
+                        <p class="text-4xl font-bold text-yellow-600" id="pointsEarned">+0</p>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="retakeQuiz()" class="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+                            Retake Quiz
+                        </button>
+                        <button onclick="showSection('quizzes')" class="bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                            Back to Quizzes
+                        </button>
+                        <button onclick="showSection('dashboard')" class="bg-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors">
+                            Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics Section -->
+        <div id="topics" class="section hidden">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Environmental Topics 📖</h2>
+                    <p class="text-xl text-gray-600">Explore and learn about our environment</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('water-pollution')">
+                        <div class="text-5xl mb-4">💧</div>
+                        <h3 class="text-xl font-bold mb-2">Water Pollution</h3>
+                        <p class="text-gray-600">Learn about water contamination and its effects</p>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('air-pollution')">
+                        <div class="text-5xl mb-4">🌫️</div>
+                        <h3 class="text-xl font-bold mb-2">Air Pollution</h3>
+                        <p class="text-gray-600">Understanding air quality and pollution sources</p>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('climate-change')">
+                        <div class="text-5xl mb-4">🌡️</div>
+                        <h3 class="text-xl font-bold mb-2">Climate Change</h3>
+                        <p class="text-gray-600">Global warming and its environmental impact</p>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('renewable-energy')">
+                        <div class="text-5xl mb-4">⚡</div>
+                        <h3 class="text-xl font-bold mb-2">Renewable Energy</h3>
+                        <p class="text-gray-600">Sustainable energy sources and solutions</p>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('biodiversity')">
+                        <div class="text-5xl mb-4">🦋</div>
+                        <h3 class="text-xl font-bold mb-2">Biodiversity</h3>
+                        <p class="text-gray-600">Ecosystem diversity and conservation</p>
+                    </div>
+
+                    <div class="quiz-card bg-white rounded-2xl p-6 shadow-lg cursor-pointer" onclick="showTopic('waste-management')">
+                        <div class="text-5xl mb-4">♻️</div>
+                        <h3 class="text-xl font-bold mb-2">Waste Management</h3>
+                        <p class="text-gray-600">Recycling and sustainable waste practices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Detail View -->
+        <div id="topicDetail" class="section hidden">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="showSection('topics')" class="mb-6 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
+                    ← Back to Topics
+                </button>
+                
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-center mb-8">
+                        <div class="text-8xl mb-4" id="topicEmoji">💧</div>
+                        <h2 class="text-4xl font-bold mb-4" id="topicTitle">Water Pollution</h2>
+                    </div>
+                    
+                    <div id="topicContent" class="prose max-w-none">
+                        <!-- Topic content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos Section -->
+        <div id="videos" class="section hidden">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Educational Videos 🎥</h2>
+                    <p class="text-xl text-gray-600">Learn through engaging video content</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Climate Change Basics</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Understanding Climate Change</h3>
+                            <p class="text-gray-600 mb-4">Learn the fundamentals of global warming and climate science</p>
+                            <a href="https://www.youtube.com/watch?v=G4H1N_yXBiA" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Ocean Pollution</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Plastic in Our Oceans</h3>
+                            <p class="text-gray-600 mb-4">Discover how plastic pollution affects marine life</p>
+                            <a href="https://www.youtube.com/watch?v=HQTUWK7CM-Y" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Renewable Energy</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Solar and Wind Power</h3>
+                            <p class="text-gray-600 mb-4">Explore sustainable energy solutions for the future</p>
+                            <a href="https://www.youtube.com/watch?v=1kUE0BZtTRc" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-purple-400 to-purple-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Biodiversity</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Protecting Wildlife</h3>
+                            <p class="text-gray-600 mb-4">Learn about ecosystem conservation and species protection</p>
+                            <a href="https://www.youtube.com/watch?v=GK_vRtHJZu4" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-teal-400 to-teal-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Recycling</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Waste Management</h3>
+                            <p class="text-gray-600 mb-4">Understanding recycling and waste reduction strategies</p>
+                            <a href="https://www.youtube.com/watch?v=6jQ7y_qQYUA" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-400 to-indigo-600 h-48 flex items-center justify-center">
+                            <div class="text-white text-center">
+                                <div class="text-6xl mb-2">🎬</div>
+                                <p class="text-lg font-semibold">Sustainable Living</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">Eco-Friendly Lifestyle</h3>
+                            <p class="text-gray-600 mb-4">Tips for living sustainably and reducing your carbon footprint</p>
+                            <a href="https://www.youtube.com/watch?v=V3QpNHLd-hc" target="_blank" 
+                               class="inline-block bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard" class="section hidden">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Leaderboard 🏆</h2>
+                    <p class="text-xl text-gray-600">See how you rank among other eco-warriors!</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-yellow-400 to-yellow-600 p-6 text-white">
+                        <h3 class="text-2xl font-bold">Top Eco-Warriors</h3>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div id="leaderboardList" class="space-y-4">
+                            <!-- Leaderboard entries will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile" class="section hidden">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <div class="text-center mb-8">
+                        <div class="text-8xl mb-4">👤</div>
+                        <h2 class="text-3xl font-bold" id="profileName">User Profile</h2>
+                        <p class="text-gray-600" id="profileAge">Age: 0</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Profile Stats -->
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Your Stats</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <span class="font-medium">Total Points</span>
+                                    <span class="text-2xl font-bold text-green-600" id="profilePoints">0</span>
+                                </div>
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <span class="font-medium">Current Level</span>
+                                    <span class="text-xl font-bold text-blue-600" id="profileLevel">Beginner</span>
+                                </div>
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <span class="font-medium">Rating</span>
+                                    <span class="text-xl font-bold" id="profileRating">Good</span>
+                                </div>
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <span class="font-medium">Quizzes Completed</span>
+                                    <span class="text-xl font-bold text-purple-600" id="profileQuizzes">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Profile -->
+                        <div>
+                            <h3 class="text-2xl font-bold mb-4">Edit Profile</h3>
+                            <form id="editProfileForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                    <input type="text" id="editName" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                                    <input type="number" id="editAge" min="5" max="100"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                </div>
+                                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                                    Update Profile
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = {
+            name: '',
+            age: 0,
+            points: 0,
+            level: 'Beginner',
+            rating: 'Good',
+            quizzesCompleted: 0,
+            completedQuizzes: []
+        };
+
+        let currentQuiz = {
+            level: '',
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            startTime: null,
+            answers: []
+        };
+
+        let timerInterval;
+
+        // Demo users for leaderboard
+        const demoUsers = [
+            { name: 'EcoMaster Alex', points: 2450, rating: 'Excellent', time: '2:30' },
+            { name: 'GreenGuru Sam', points: 2200, rating: 'Excellent', time: '3:15' },
+            { name: 'NatureLover Maya', points: 1980, rating: 'Good', time: '4:20' },
+            { name: 'ClimateChamp Rio', points: 1750, rating: 'Good', time: '3:45' },
+            { name: 'EcoWarrior Zoe', points: 1650, rating: 'Average', time: '5:10' }
+        ];
+
+        // Quiz questions database
+        const quizQuestions = {
+            beginner: [
+                {
+                    question: "What is the main cause of global warming?",
+                    options: ["Greenhouse gases", "Ocean currents", "Solar flares", "Volcanic activity"],
+                    correct: 0,
+                    explanation: "Greenhouse gases like CO2 trap heat in Earth's atmosphere, causing global temperatures to rise.",
+                    emoji: "🌡️"
+                },
+                {
+                    question: "Which of these is a renewable energy source?",
+                    options: ["Coal", "Solar power", "Natural gas", "Oil"],
+                    correct: 1,
+                    explanation: "Solar power harnesses energy from the sun, which is unlimited and doesn't produce harmful emissions.",
+                    emoji: "☀️"
+                },
+                {
+                    question: "What does the 3 R's of waste management stand for?",
+                    options: ["Read, Write, Recite", "Reduce, Reuse, Recycle", "Run, Rest, Repeat", "Red, Green, Blue"],
+                    correct: 1,
+                    explanation: "The 3 R's - Reduce consumption, Reuse items, and Recycle materials - help minimize waste.",
+                    emoji: "♻️"
+                },
+                {
+                    question: "Which gas makes up most of Earth's atmosphere?",
+                    options: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+                    correct: 2,
+                    explanation: "Nitrogen makes up about 78% of Earth's atmosphere, while oxygen is about 21%.",
+                    emoji: "🌍"
+                },
+                {
+                    question: "What is biodiversity?",
+                    options: ["Types of rocks", "Variety of life forms", "Weather patterns", "Ocean depths"],
+                    correct: 1,
+                    explanation: "Biodiversity refers to the variety of plant and animal life in ecosystems.",
+                    emoji: "🦋"
+                }
+            ],
+            intermediate: [
+                {
+                    question: "What is the greenhouse effect?",
+                    options: ["Plants growing in greenhouses", "Trapping of heat in atmosphere", "Green energy production", "Photosynthesis process"],
+                    correct: 1,
+                    explanation: "The greenhouse effect occurs when greenhouse gases trap heat from the sun in Earth's atmosphere.",
+                    emoji: "🏠"
+                },
+                {
+                    question: "Which ecosystem has the highest biodiversity?",
+                    options: ["Desert", "Tropical rainforest", "Arctic tundra", "Grassland"],
+                    correct: 1,
+                    explanation: "Tropical rainforests contain more than half of the world's plant and animal species.",
+                    emoji: "🌳"
+                },
+                {
+                    question: "What is acid rain caused by?",
+                    options: ["Too much water", "Sulfur and nitrogen compounds", "Salt from oceans", "Dust particles"],
+                    correct: 1,
+                    explanation: "Acid rain forms when sulfur dioxide and nitrogen oxides mix with water in the atmosphere.",
+                    emoji: "🌧️"
+                },
+                {
+                    question: "Which layer of atmosphere contains the ozone layer?",
+                    options: ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"],
+                    correct: 1,
+                    explanation: "The ozone layer is located in the stratosphere and protects us from harmful UV radiation.",
+                    emoji: "🛡️"
+                },
+                {
+                    question: "What is eutrophication?",
+                    options: ["Water purification", "Excessive nutrients in water", "Fish migration", "Ocean warming"],
+                    correct: 1,
+                    explanation: "Eutrophication occurs when water bodies receive excess nutrients, leading to algae blooms.",
+                    emoji: "🌊"
+                },
+                {
+                    question: "Which renewable energy source is most widely used globally?",
+                    options: ["Solar", "Wind", "Hydroelectric", "Geothermal"],
+                    correct: 2,
+                    explanation: "Hydroelectric power is currently the most widely used renewable energy source worldwide.",
+                    emoji: "💧"
+                },
+                {
+                    question: "What is carbon footprint?",
+                    options: ["Footprints in coal", "Amount of CO2 emissions", "Black soil", "Fossil fuel deposits"],
+                    correct: 1,
+                    explanation: "Carbon footprint measures the total greenhouse gas emissions caused by an individual or organization.",
+                    emoji: "👣"
+                }
+            ],
+            advanced: [
+                {
+                    question: "What is the primary driver of ocean acidification?",
+                    options: ["Industrial waste", "CO2 absorption", "Oil spills", "Plastic pollution"],
+                    correct: 1,
+                    explanation: "Ocean acidification occurs when seawater absorbs CO2 from the atmosphere, forming carbonic acid.",
+                    emoji: "🌊"
+                },
+                {
+                    question: "Which feedback loop accelerates climate change?",
+                    options: ["Cloud formation", "Ice-albedo feedback", "Ocean circulation", "Volcanic activity"],
+                    correct: 1,
+                    explanation: "Ice-albedo feedback: as ice melts, darker surfaces absorb more heat, causing more melting.",
+                    emoji: "🧊"
+                },
+                {
+                    question: "What is the main component of photochemical smog?",
+                    options: ["Carbon monoxide", "Ozone", "Methane", "Sulfur dioxide"],
+                    correct: 1,
+                    explanation: "Ground-level ozone forms when pollutants react with sunlight, creating photochemical smog.",
+                    emoji: "🌫️"
+                },
+                {
+                    question: "Which biome stores the most carbon?",
+                    options: ["Tropical forests", "Temperate forests", "Peatlands", "Grasslands"],
+                    correct: 2,
+                    explanation: "Peatlands store about 30% of global soil carbon despite covering only 3% of land area.",
+                    emoji: "🌿"
+                },
+                {
+                    question: "What is the tipping point in climate science?",
+                    options: ["Maximum temperature", "Irreversible change threshold", "Seasonal variation", "Daily temperature range"],
+                    correct: 1,
+                    explanation: "A tipping point is a threshold beyond which a system undergoes irreversible change.",
+                    emoji: "⚖️"
+                },
+                {
+                    question: "Which process removes CO2 from the atmosphere naturally?",
+                    options: ["Respiration", "Photosynthesis", "Combustion", "Decomposition"],
+                    correct: 1,
+                    explanation: "Photosynthesis removes CO2 from the atmosphere and converts it into organic compounds.",
+                    emoji: "🌱"
+                },
+                {
+                    question: "What is bioaccumulation?",
+                    options: ["Species evolution", "Toxin concentration increase", "Population growth", "Habitat expansion"],
+                    correct: 1,
+                    explanation: "Bioaccumulation is the buildup of toxic substances in organisms over time.",
+                    emoji: "🐟"
+                },
+                {
+                    question: "Which gas has the highest global warming potential?",
+                    options: ["CO2", "Methane", "Nitrous oxide", "Sulfur hexafluoride"],
+                    correct: 3,
+                    explanation: "Sulfur hexafluoride has a global warming potential about 23,000 times higher than CO2.",
+                    emoji: "🔥"
+                },
+                {
+                    question: "What is the main cause of coral bleaching?",
+                    options: ["Ocean pollution", "Rising water temperature", "Overfishing", "Coastal development"],
+                    correct: 1,
+                    explanation: "Coral bleaching occurs when rising water temperatures stress corals, causing them to expel algae.",
+                    emoji: "🪸"
+                },
+                {
+                    question: "Which renewable energy has the lowest carbon footprint?",
+                    options: ["Solar PV", "Wind", "Nuclear", "Hydroelectric"],
+                    correct: 2,
+                    explanation: "Nuclear energy has one of the lowest lifecycle carbon footprints among all energy sources.",
+                    emoji: "⚛️"
+                }
+            ],
+            bonus: [
+                {
+                    question: "What percentage of Earth's water is freshwater?",
+                    options: ["2.5%", "10%", "25%", "50%"],
+                    correct: 0,
+                    explanation: "Only about 2.5% of Earth's water is freshwater, and most of that is frozen in ice caps.",
+                    emoji: "💧"
+                },
+                {
+                    question: "Which country produces the most renewable energy?",
+                    options: ["USA", "Germany", "China", "Brazil"],
+                    correct: 2,
+                    explanation: "China is the world's largest producer of renewable energy, particularly solar and wind.",
+                    emoji: "🏭"
+                },
+                {
+                    question: "How long does it take for plastic to decompose?",
+                    options: ["10 years", "100 years", "500+ years", "1000+ years"],
+                    correct: 2,
+                    explanation: "Most plastics take 500-1000 years to decompose, which is why recycling is so important.",
+                    emoji: "🗑️"
+                }
+            ]
+        };
+
+        // Topic content database
+        const topicContent = {
+            'water-pollution': {
+                emoji: '💧',
+                title: 'Water Pollution',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">What is Water Pollution?</h3>
+                            <p class="text-lg">Water pollution occurs when harmful substances contaminate water bodies like rivers, lakes, oceans, and groundwater, making them unsafe for human use and harmful to aquatic life.</p>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Main Causes</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Industrial waste discharge</li>
+                                <li>Agricultural runoff (pesticides, fertilizers)</li>
+                                <li>Sewage and wastewater</li>
+                                <li>Oil spills</li>
+                                <li>Plastic waste</li>
+                                <li>Chemical dumping</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Effects on Environment</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Death of aquatic animals</li>
+                                <li>Disruption of food chains</li>
+                                <li>Eutrophication (algae blooms)</li>
+                                <li>Contamination of drinking water</li>
+                                <li>Ecosystem destruction</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Solutions</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Proper waste treatment</li>
+                                <li>Reduce plastic usage</li>
+                                <li>Support clean water initiatives</li>
+                                <li>Use eco-friendly products</li>
+                                <li>Prevent littering</li>
+                                <li>Industrial regulation</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            'air-pollution': {
+                emoji: '🌫️',
+                title: 'Air Pollution',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">What is Air Pollution?</h3>
+                            <p class="text-lg">Air pollution is the contamination of air by harmful substances that can cause health problems and environmental damage.</p>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Major Pollutants</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Carbon monoxide (CO)</li>
+                                <li>Sulfur dioxide (SO2)</li>
+                                <li>Nitrogen oxides (NOx)</li>
+                                <li>Particulate matter (PM2.5, PM10)</li>
+                                <li>Ozone (O3)</li>
+                                <li>Volatile organic compounds (VOCs)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-orange-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Health Effects</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Respiratory diseases</li>
+                                <li>Heart problems</li>
+                                <li>Lung cancer</li>
+                                <li>Asthma and allergies</li>
+                                <li>Reduced life expectancy</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Prevention Methods</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Use public transportation</li>
+                                <li>Switch to renewable energy</li>
+                                <li>Plant more trees</li>
+                                <li>Reduce industrial emissions</li>
+                                <li>Use electric vehicles</li>
+                                <li>Support clean air policies</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            'climate-change': {
+                emoji: '🌡️',
+                title: 'Climate Change',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Understanding Climate Change</h3>
+                            <p class="text-lg">Climate change refers to long-term shifts in global temperatures and weather patterns, primarily caused by human activities since the Industrial Revolution.</p>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Greenhouse Gases</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Carbon dioxide (CO2) - 76%</li>
+                                <li>Methane (CH4) - 16%</li>
+                                <li>Nitrous oxide (N2O) - 6%</li>
+                                <li>Fluorinated gases - 2%</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Impacts</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Rising sea levels</li>
+                                <li>Extreme weather events</li>
+                                <li>Melting ice caps and glaciers</li>
+                                <li>Species extinction</li>
+                                <li>Food and water scarcity</li>
+                                <li>Economic losses</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Solutions</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Transition to renewable energy</li>
+                                <li>Energy efficiency improvements</li>
+                                <li>Sustainable transportation</li>
+                                <li>Forest conservation</li>
+                                <li>Carbon pricing</li>
+                                <li>International cooperation</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            'renewable-energy': {
+                emoji: '⚡',
+                title: 'Renewable Energy',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">What is Renewable Energy?</h3>
+                            <p class="text-lg">Renewable energy comes from natural sources that are constantly replenished, such as sunlight, wind, rain, tides, waves, and geothermal heat.</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Types of Renewable Energy</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Solar energy - from sunlight</li>
+                                <li>Wind energy - from air movement</li>
+                                <li>Hydroelectric - from flowing water</li>
+                                <li>Geothermal - from Earth's heat</li>
+                                <li>Biomass - from organic materials</li>
+                                <li>Tidal energy - from ocean tides</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Benefits</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Reduces greenhouse gas emissions</li>
+                                <li>Unlimited supply</li>
+                                <li>Lower operating costs</li>
+                                <li>Job creation</li>
+                                <li>Energy independence</li>
+                                <li>Improved air quality</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Future Outlook</h3>
+                            <p class="text-lg">Renewable energy is the fastest-growing energy source globally, with costs continuing to decrease and efficiency improving through technological advances.</p>
+                        </div>
+                    </div>
+                `
+            },
+            'biodiversity': {
+                emoji: '🦋',
+                title: 'Biodiversity',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">What is Biodiversity?</h3>
+                            <p class="text-lg">Biodiversity refers to the variety of life on Earth, including the variety of species, genetic diversity within species, and the variety of ecosystems.</p>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Levels of Biodiversity</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Genetic diversity - variation within species</li>
+                                <li>Species diversity - variety of species</li>
+                                <li>Ecosystem diversity - variety of habitats</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Threats to Biodiversity</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Habitat destruction</li>
+                                <li>Climate change</li>
+                                <li>Pollution</li>
+                                <li>Overexploitation</li>
+                                <li>Invasive species</li>
+                                <li>Disease</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Conservation Strategies</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Protected areas and reserves</li>
+                                <li>Sustainable resource use</li>
+                                <li>Habitat restoration</li>
+                                <li>Species breeding programs</li>
+                                <li>International cooperation</li>
+                                <li>Community involvement</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            'waste-management': {
+                emoji: '♻️',
+                title: 'Waste Management',
+                content: `
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">What is Waste Management?</h3>
+                            <p class="text-lg">Waste management involves the collection, transport, treatment, and disposal of waste materials in a way that minimizes their impact on human health and the environment.</p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">The 3 R's Hierarchy</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li><strong>Reduce</strong> - Use less, buy only what you need</li>
+                                <li><strong>Reuse</strong> - Find new uses for items</li>
+                                <li><strong>Recycle</strong> - Process materials into new products</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Types of Waste</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Organic waste (food scraps, yard waste)</li>
+                                <li>Recyclable materials (paper, plastic, metal)</li>
+                                <li>Hazardous waste (chemicals, batteries)</li>
+                                <li>Electronic waste (computers, phones)</li>
+                                <li>Construction waste</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold mb-4">Sustainable Practices</h3>
+                            <ul class="list-disc list-inside space-y-2 text-lg">
+                                <li>Composting organic waste</li>
+                                <li>Proper sorting and recycling</li>
+                                <li>Using reusable bags and containers</li>
+                                <li>Donating or selling usable items</li>
+                                <li>Choosing products with minimal packaging</li>
+                                <li>Supporting circular economy initiatives</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form handler
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('userName').value.trim();
+                const age = parseInt(document.getElementById('userAge').value);
+                
+                if (name && age >= 5 && age <= 100) {
+                    currentUser.name = name;
+                    currentUser.age = age;
+                    
+                    // Hide login screen and show main app
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    
+                    // Update UI with user info
+                    updateUserInterface();
+                    showSection('dashboard');
+                }
+            });
+
+            // Profile edit form handler
+            document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newName = document.getElementById('editName').value.trim();
+                const newAge = parseInt(document.getElementById('editAge').value);
+                
+                if (newName && newAge >= 5 && newAge <= 100) {
+                    currentUser.name = newName;
+                    currentUser.age = newAge;
+                    updateUserInterface();
+                    alert('Profile updated successfully! 🎉');
+                }
+            });
+        });
+
+        // Update user interface with current user data
+        function updateUserInterface() {
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('welcomeName').textContent = currentUser.name;
+            document.getElementById('totalPoints').textContent = currentUser.points;
+            document.getElementById('currentLevel').textContent = currentUser.level;
+            document.getElementById('userRating').textContent = currentUser.rating;
+            document.getElementById('quizzesCompleted').textContent = currentUser.quizzesCompleted;
+            
+            // Update profile section
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileAge').textContent = `Age: ${currentUser.age}`;
+            document.getElementById('profilePoints').textContent = currentUser.points;
+            document.getElementById('profileLevel').textContent = currentUser.level;
+            document.getElementById('profileRating').textContent = currentUser.rating;
+            document.getElementById('profileQuizzes').textContent = currentUser.quizzesCompleted;
+            
+            // Update edit form
+            document.getElementById('editName').value = currentUser.name;
+            document.getElementById('editAge').value = currentUser.age;
+            
+            // Update rating color
+            updateRatingDisplay();
+            
+            // Check for bonus round eligibility
+            checkBonusEligibility();
+            
+            // Update leaderboard
+            updateLeaderboard();
+        }
+
+        // Update rating display with appropriate color
+        function updateRatingDisplay() {
+            const ratingElements = document.querySelectorAll('#userRating, #profileRating');
+            const rating = currentUser.rating.toLowerCase();
+            
+            ratingElements.forEach(element => {
+                element.className = element.className.replace(/rating-\w+/g, '');
+                element.classList.add(`rating-${rating}`);
+            });
+        }
+
+        // Check if user is eligible for bonus round
+        function checkBonusEligibility() {
+            const bonusAlert = document.getElementById('bonusAlert');
+            if (currentUser.points < 50) {
+                bonusAlert.classList.remove('hidden');
+            } else {
+                bonusAlert.classList.add('hidden');
+            }
+        }
+
+        // Show specific section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show requested section
+            document.getElementById(sectionName).classList.remove('hidden');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-green-600', 'font-bold');
+                btn.classList.add('text-gray-600');
+            });
+        }
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Start quiz
+        function startQuiz(level) {
+            currentQuiz.level = level;
+            // Shuffle questions each time quiz starts
+            currentQuiz.questions = shuffleArray(quizQuestions[level]);
+            currentQuiz.currentIndex = 0;
+            currentQuiz.score = 0;
+            currentQuiz.startTime = Date.now();
+            currentQuiz.answers = [];
+            
+            showSection('quizGame');
+            displayQuestion();
+            startTimer();
+        }
+
+        // Start bonus quiz
+        function startBonusQuiz() {
+            startQuiz('bonus');
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const question = currentQuiz.questions[currentQuiz.currentIndex];
+            const progress = ((currentQuiz.currentIndex + 1) / currentQuiz.questions.length) * 100;
+            
+            document.getElementById('quizTitle').textContent = `${currentQuiz.level.charAt(0).toUpperCase() + currentQuiz.level.slice(1)} Quiz`;
+            document.getElementById('currentQuestion').textContent = currentQuiz.currentIndex + 1;
+            document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Show question image/emoji
+            if (question.emoji) {
+                document.getElementById('questionImage').classList.remove('hidden');
+                document.getElementById('questionEmoji').textContent = question.emoji;
+            } else {
+                document.getElementById('questionImage').classList.add('hidden');
+            }
+            
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Shuffle answer options while keeping track of correct answer
+            const optionsWithIndex = question.options.map((option, index) => ({
+                text: option,
+                originalIndex: index,
+                isCorrect: index === question.correct
+            }));
+            
+            const shuffledOptions = shuffleArray(optionsWithIndex);
+            
+            // Find new correct answer index after shuffling
+            const newCorrectIndex = shuffledOptions.findIndex(option => option.isCorrect);
+            
+            // Create answer options
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+            
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full p-4 text-left border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all duration-300';
+                button.textContent = option.text;
+                button.onclick = () => selectAnswer(index, newCorrectIndex);
+                optionsContainer.appendChild(button);
+            });
+            
+            document.getElementById('nextButton').classList.add('hidden');
+        }
+
+        // Handle answer selection
+        function selectAnswer(selectedIndex, correctIndex) {
+            const question = currentQuiz.questions[currentQuiz.currentIndex];
+            const options = document.querySelectorAll('#answerOptions button');
+            
+            // Disable all options
+            options.forEach(option => option.disabled = true);
+            
+            // Show correct/incorrect styling
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('border-green-500', 'bg-green-100', 'text-green-800');
+                } else if (index === selectedIndex && index !== correctIndex) {
+                    option.classList.add('border-red-500', 'bg-red-100', 'text-red-800');
+                }
+            });
+            
+            // Record answer
+            const isCorrect = selectedIndex === correctIndex;
+            currentQuiz.answers.push({
+                questionIndex: currentQuiz.currentIndex,
+                selectedIndex,
+                correct: isCorrect
+            });
+            
+            if (isCorrect) {
+                currentQuiz.score++;
+            }
+            
+            // Show explanation
+            setTimeout(() => {
+                alert(`${isCorrect ? '✅ Correct!' : '❌ Incorrect!'}\n\n${question.explanation}`);
+                document.getElementById('nextButton').classList.remove('hidden');
+            }, 1000);
+        }
+
+        // Move to next question
+        function nextQuestion() {
+            currentQuiz.currentIndex++;
+            
+            if (currentQuiz.currentIndex < currentQuiz.questions.length) {
+                displayQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Finish quiz and show results
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            const endTime = Date.now();
+            const timeTaken = Math.floor((endTime - currentQuiz.startTime) / 1000);
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+            
+            // Calculate points
+            let pointsPerQuestion;
+            switch(currentQuiz.level) {
+                case 'beginner': pointsPerQuestion = 10; break;
+                case 'intermediate': pointsPerQuestion = 15; break;
+                case 'advanced': pointsPerQuestion = 20; break;
+                case 'bonus': pointsPerQuestion = 25; break;
+                default: pointsPerQuestion = 10;
+            }
+            
+            const correctAnswers = currentQuiz.score;
+            const wrongAnswers = currentQuiz.questions.length - correctAnswers;
+            const pointsEarned = (correctAnswers * pointsPerQuestion) - (wrongAnswers * 5);
+            
+            // Update user stats
+            currentUser.points += Math.max(0, pointsEarned);
+            currentUser.quizzesCompleted++;
+            currentUser.completedQuizzes.push({
+                level: currentQuiz.level,
+                score: correctAnswers,
+                total: currentQuiz.questions.length,
+                time: timeTaken,
+                points: pointsEarned
+            });
+            
+            // Update level and rating
+            updateUserLevel();
+            updateUserRating();
+            
+            // Show results
+            document.getElementById('resultEmoji').textContent = correctAnswers >= currentQuiz.questions.length * 0.8 ? '🎉' : correctAnswers >= currentQuiz.questions.length * 0.6 ? '👍' : '💪';
+            document.getElementById('resultTitle').textContent = correctAnswers >= currentQuiz.questions.length * 0.8 ? 'Excellent!' : correctAnswers >= currentQuiz.questions.length * 0.6 ? 'Good Job!' : 'Keep Learning!';
+            document.getElementById('resultMessage').textContent = `You scored ${correctAnswers} out of ${currentQuiz.questions.length} questions correctly!`;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('wrongAnswers').textContent = wrongAnswers;
+            document.getElementById('timeTaken').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('pointsEarned').textContent = pointsEarned >= 0 ? `+${pointsEarned}` : pointsEarned;
+            
+            updateUserInterface();
+            showSection('quizResults');
+        }
+
+        // Update user level based on points
+        function updateUserLevel() {
+            if (currentUser.points >= 500) {
+                currentUser.level = 'Expert';
+            } else if (currentUser.points >= 200) {
+                currentUser.level = 'Advanced';
+            } else if (currentUser.points >= 100) {
+                currentUser.level = 'Intermediate';
+            } else {
+                currentUser.level = 'Beginner';
+            }
+        }
+
+        // Update user rating based on performance
+        function updateUserRating() {
+            const avgScore = currentUser.completedQuizzes.length > 0 
+                ? currentUser.completedQuizzes.reduce((sum, quiz) => sum + (quiz.score / quiz.total), 0) / currentUser.completedQuizzes.length 
+                : 0;
+            
+            if (avgScore >= 0.9) {
+                currentUser.rating = 'Excellent';
+            } else if (avgScore >= 0.8) {
+                currentUser.rating = 'Good';
+            } else if (avgScore >= 0.6) {
+                currentUser.rating = 'Average';
+            } else if (avgScore >= 0.4) {
+                currentUser.rating = 'Poor';
+            } else {
+                currentUser.rating = 'Worst';
+            }
+        }
+
+        // Start quiz timer
+        function startTimer() {
+            let seconds = 0;
+            timerInterval = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Retake current quiz
+        function retakeQuiz() {
+            startQuiz(currentQuiz.level);
+        }
+
+        // Show topic detail
+        function showTopic(topicId) {
+            const topic = topicContent[topicId];
+            if (topic) {
+                document.getElementById('topicEmoji').textContent = topic.emoji;
+                document.getElementById('topicTitle').textContent = topic.title;
+                document.getElementById('topicContent').innerHTML = topic.content;
+                showSection('topicDetail');
+            }
+        }
+
+        // Update leaderboard
+        function updateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            const allUsers = [...demoUsers, {
+                name: currentUser.name,
+                points: currentUser.points,
+                rating: currentUser.rating,
+                time: currentUser.completedQuizzes.length > 0 
+                    ? `${Math.floor(currentUser.completedQuizzes[currentUser.completedQuizzes.length - 1].time / 60)}:${(currentUser.completedQuizzes[currentUser.completedQuizzes.length - 1].time % 60).toString().padStart(2, '0')}`
+                    : 'N/A'
+            }];
+            
+            // Sort by points
+            allUsers.sort((a, b) => b.points - a.points);
+            
+            leaderboardList.innerHTML = '';
+            
+            allUsers.forEach((user, index) => {
+                const isCurrentUser = user.name === currentUser.name;
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 rounded-lg ${isCurrentUser ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-50'}`;
+                
+                div.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="text-2xl font-bold ${index === 0 ? 'text-yellow-500' : index === 1 ? 'text-gray-400' : index === 2 ? 'text-yellow-600' : 'text-gray-600'}">
+                            ${index + 1}${index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''}
+                        </div>
+                        <div>
+                            <p class="font-bold ${isCurrentUser ? 'text-green-800' : 'text-gray-800'}">${user.name} ${isCurrentUser ? '(You)' : ''}</p>
+                            <p class="text-sm text-gray-600">Rating: <span class="rating-${user.rating.toLowerCase()}">${user.rating}</span></p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-green-600">${user.points}</p>
+                        <p class="text-sm text-gray-500">Best time: ${user.time}</p>
+                    </div>
+                `;
+                
+                leaderboardList.appendChild(div);
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97fe4a3801a284a7',t:'MTc1ODAwMzk2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
